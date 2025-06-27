@@ -33,14 +33,6 @@
 * Constants easily configured in `constants.json`
 * Embedded demo GIF to preview full functionality
 
----
-
-## Demo
-
-!(demo.gif)
-
----
-
 ## Requirements
 
 ### Node.js
