@@ -1,6 +1,6 @@
-# Interactive Math Graph Plotter
+# Project 1 Dmeo
 
-**Interactive Math Graph Plotter** is a local JavaScript application that visualizes quadratic equations in the form `ax^2 + bx + c`, with interactive graph manipulation and real-time updates using WebSocket communication.
+**Project 1 Dmeo** is a local JavaScript application that visualizes quadratic equations in the form `ax^2 + bx + c`, with interactive graph manipulation and real-time updates using WebSocket communication.
 
 ---
 
@@ -37,7 +37,7 @@
 
 ## Demo
 
-![Graph Plotter Demo](demo.gif)
+!(demo.gif)
 
 ---
 
