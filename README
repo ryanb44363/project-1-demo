@@ -1,100 +1,96 @@
 # Interactive Math Graph Plotter
 
-This project is a clean, modular, and extensible JavaScript application that visualizes quadratic equations in the form y = ax^2 + bx + c, with interactive graph features and WebSocket-based communication.
+**Interactive Math Graph Plotter** is a local JavaScript application that visualizes quadratic equations in the form `ax^2 + bx + c`, with interactive graph manipulation and real-time updates using WebSocket communication.
 
-## Features
+---
 
-* Real-time plotting of a quadratic equation via a WebSocket server
-* Adjustable zoom and pan controls
-* Point plotting and label display
-* Selection of up to 3 dots at a time using rectangular selection
-* Action menu for selected points
-* Separated files for HTML, CSS, and JavaScript
-* All communication handled via JSON messages through WebSocket
-* Easily adjustable constants via constants.json
-
-## File Structure
+## Project Structure
 
 ```
 .
-├── index.html           # Clean HTML layout (no inline styles/scripts)
-├── style.css            # All styles defined here
-├── script.js            # Graph logic and WebSocket communication
-├── server.js            # WebSocket server
-├── constants.json       # Adjustable values for styling, dot size, etc.
-├── package.json         # Project metadata and dependencies
-├── package-lock.json    # Dependency lock file
+├── README                  # Project documentation (this file)
+├── index.html              # HTML layout with clean separation (no inline styling or scripts)
+├── style.css               # All application styling and layout definitions
+├── script.js               # Main logic for graph rendering and WebSocket handling
+├── server.js               # WebSocket server setup using Node.js
+├── constants.json          # Configurable settings for dot sizes, axis spacing, etc.
+├── demo.gif                # Animated demonstration of graph features
+├── package.json            # Project metadata and dependencies
+├── package-lock.json       # Dependency lock file
+└── node_modules/           # Installed packages and libraries
 ```
+
+---
+
+## Features
+
+* Real-time plotting of quadratic functions via WebSocket
+* Zoom and pan control with mouse input
+* Point selection and contextual action menu
+* Drag-to-select up to 3 points simultaneously
+* Modular architecture: clean separation of HTML, CSS, JS
+* All updates communicated via JSON messages through WebSocket
+* Constants easily configured in `constants.json`
+* Embedded demo GIF to preview full functionality
+
+---
+
+## Demo
+
+![Graph Plotter Demo](demo.gif)
+
+---
 
 ## Requirements
 
 ### Node.js
 
 * Version: v14+
-* Install: [https://nodejs.org/](https://nodejs.org/)
+* Download: [https://nodejs.org/](https://nodejs.org/)
 
 ### NPM Packages
 
-Install dependencies with:
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Dependencies include:
+Includes:
 
-* ws: WebSocket server for backend communication
+* `ws`: WebSocket server for live communication
+
+---
 
 ## Running the Project
 
-1. Start the WebSocket server:
+Start the WebSocket server:
 
-   ```bash
-   node server.js
-   ```
-
-   You should see:
-
-   ```
-   WebSocket server running on ws://localhost:4000
-   ```
-
-2. Open the frontend:
-
-   * Open index.html in any modern browser (Chrome, Firefox, etc.)
-   * Make sure the page loads with the graph canvas and controls
-
-3. Usage:
-
-   * Input a number and number of involutions (points)
-   * Click Calculate
-   * View plotted graph with labeled dots
-   * Use drag selection to choose dots
-   * Use the action panel on the right to label or modify selected points
-
-## Debugging and Custom Testing
-
-You can type custom JSON messages in the browser's console using the structure:
-
-```json
-{
-  "message_type": "custom",
-  "optional_message_specific_data": "..."
-}
+```bash
+node server.js
 ```
 
-## Notes
+Then open `index.html` in a web browser (Chrome, Firefox, etc.) to start interacting with the graph.
 
-* Fully compliant with non-inline CSS/JS structure
-* No external libraries or frameworks (vanilla JS + WebSocket)
-* All styles editable in style.css
-* Dot logic and math equation logic in script.js
+---
 
-## Contact
+## Usage Tips
 
-Made by Munus Solutions LLC
-Contact: Ryan Bellknapp
-Email: [info@munus-solutions.us](mailto:info@munus-solutions.us)
-Email: [ryanb44363@gmail.com](mailto:ryanb44363@gmail.com)
-Website: [https://munus-solutions.us](https://munus-solutions.us)
-Phone: (678) 585-6204
+* Modify `constants.json` to change graph scale, dot sizes, and label visibility.
+* Use scroll to zoom in/out, click and drag to pan the graph.
+* Right-click or long-press on dots to bring up the action menu.
+
+---
+
+## Future Improvements
+
+* Saving/loading plotted equations
+* Drag-and-drop points to modify coefficients
+* Multi-function plotting (e.g., sine, exponential)
+* Mobile touch support
+
+---
+
+## License
+
+This project is open source and free to use under the MIT License.
