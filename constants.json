@@ -1,0 +1,18 @@
+{
+    "zoom": {
+      "min": -10,
+      "max": 10,
+      "default": 0,
+      "step": 1,
+      "scaleFactor": 20
+    },
+    "dot": {
+      "thickness": 4,
+      "selectedThickness": 6,
+      "selectedColor": "#ff0000",
+      "defaultColor": "#000000"
+    },
+    "involutions": 3,
+    "colors": ["#ff0000", "#00ff00", "#0000ff", "#ffa500", "#800080", "#008080", "#ff69b4", "#000000"]
+  }
+  

@@ -1,0 +1,53 @@
+/* Set default body styling: remove margin, use a sans-serif font, center contents, and apply a light background */
+body {
+    margin: 0;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+/* Style the canvas with a border, white background, and crosshair cursor for drawing/selecting */
+canvas {
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: crosshair;
+}
+
+/* Container for input controls and buttons with spacing between them */
+#controls {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+}
+
+/* Apply consistent padding and font sizing to inputs and buttons */
+input, button {
+    padding: 5px;
+    font-size: 14px;
+}
+
+/* Status message styling: slightly bold and darker text */
+#status {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Class used for axis lines in SVG or canvas drawings */
+.axis {
+    stroke: #000;
+    stroke-width: 2px;
+}
+
+/* Class used for grid lines in SVG or canvas drawings */
+.grid {
+    stroke: #ccc;
+    stroke-width: 1px;
+}
+
+/* Class used for dot elements, typically used for marking points on a graph */
+.dot {
+    fill: #000;
+}

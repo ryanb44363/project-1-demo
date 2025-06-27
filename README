@@ -1,0 +1,101 @@
+# Interactive Math Graph Plotter
+
+This project is a clean, modular, and extensible JavaScript application that visualizes quadratic equations in the form y = ax^2 + bx + c, with interactive graph features and WebSocket-based communication.
+
+## Features
+
+* Real-time plotting of a quadratic equation via a WebSocket server
+* Adjustable zoom and pan controls
+* Point plotting and label display
+* Selection of up to 3 dots at a time using rectangular selection
+* Action menu for selected points
+* Separated files for HTML, CSS, and JavaScript
+* All communication handled via JSON messages through WebSocket
+* Easily adjustable constants via constants.json
+
+## File Structure
+
+```
+.
+├── index.html           # Clean HTML layout (no inline styles/scripts)
+├── style.css            # All styles defined here
+├── script.js            # Graph logic and WebSocket communication
+├── server.js            # WebSocket server
+├── constants.json       # Adjustable values for styling, dot size, etc.
+├── package.json         # Project metadata and dependencies
+├── package-lock.json    # Dependency lock file
+```
+
+## Requirements
+
+### Node.js
+
+* Version: v14+
+* Install: [https://nodejs.org/](https://nodejs.org/)
+
+### NPM Packages
+
+Install dependencies with:
+
+```bash
+npm install
+```
+
+Dependencies include:
+
+* ws: WebSocket server for backend communication
+
+## Running the Project
+
+1. Start the WebSocket server:
+
+   ```bash
+   node server.js
+   ```
+
+   
+   You should see:
+
+   ```
+   WebSocket server running on ws://localhost:4000
+   ```
+
+2. Open the frontend:
+
+   * Open index.html in any modern browser (Chrome, Firefox, etc.)
+   * Make sure the page loads with the graph canvas and controls
+
+3. Usage:
+
+   * Input a number and number of involutions (points)
+   * Click Calculate
+   * View plotted graph with labeled dots
+   * Use drag selection to choose dots
+   * Use the action panel on the right to label or modify selected points
+
+## Debugging and Custom Testing
+
+You can type custom JSON messages in the browser's console using the structure:
+
+```json
+{
+  "message_type": "custom",
+  "optional_message_specific_data": "..."
+}
+```
+
+## Notes
+
+* Fully compliant with non-inline CSS/JS structure
+* No external libraries or frameworks (vanilla JS + WebSocket)
+* All styles editable in style.css
+* Dot logic and math equation logic in script.js
+
+## Contact
+
+Made by Munus Solutions LLC
+Contact: Ryan Bellknapp
+Email: [info@munus-solutions.us](mailto:info@munus-solutions.us)
+Email: [ryanb44363@gmail.com](mailto:ryanb44363@gmail.com)
+Website: [https://munus-solutions.us](https://munus-solutions.us)
+Phone: (678) 585-6204
