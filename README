@@ -16,10 +16,11 @@ This project is a clean, modular, and extensible JavaScript application that vis
 
 ## Demo
 
-![Demo of Graph Plotter](demo.gif)
+![Demo of Graph Plotter](./demo.gif)
 
 ## File Structure
 
+```
 .
 ├── index.html           # Clean HTML layout (no inline styles/scripts)
 ├── style.css            # All styles defined here
@@ -29,20 +30,23 @@ This project is a clean, modular, and extensible JavaScript application that vis
 ├── package.json         # Project metadata and dependencies
 ├── package-lock.json    # Dependency lock file
 ├── demo.gif             # Visual demo of core functionality
-├── README               # This readme file
+├── README.md            # This readme file
+```
 
 ## Requirements
 
 ### Node.js
 
 * Version: v14+
-* Install: https://nodejs.org/
+* Install: [https://nodejs.org/](https://nodejs.org/)
 
 ### NPM Packages
 
 Install dependencies with:
 
+```bash
 npm install
+```
 
 Dependencies include:
 
@@ -52,33 +56,39 @@ Dependencies include:
 
 1. Start the WebSocket server:
 
+```bash
 node server.js
+```
 
 You should see:
 
+```
 WebSocket server running on ws://localhost:4000
+```
 
 2. Open the frontend:
 
 * Open index.html in any modern browser (Chrome, Firefox, etc.)
-* Make sure the page loads with the graph canvas and control inputs
+* Make sure the page loads with the graph canvas and controls
 
 3. Usage:
 
 * Input a number and number of involutions (points)
 * Click Calculate
-* View the plotted graph with labeled dots
-* Use drag selection to choose up to 3 dots at a time
-* Use the action panel or trigger WebSocket messages to manipulate or label dots
+* View plotted graph with labeled dots
+* Use drag selection to choose dots
+* Use the action panel on the right to label or modify selected points
 
 ## Debugging and Custom Testing
 
 You can type custom JSON messages in the browser's console using the structure:
 
+```json
 {
   "message_type": "custom",
   "optional_message_specific_data": "..."
 }
+```
 
 ## Notes
 
@@ -89,9 +99,9 @@ You can type custom JSON messages in the browser's console using the structure:
 
 ## Contact
 
-Made by Munus Solutions LLC  
-Contact: Ryan Bellknapp  
-Email: info@munus-solutions.us  
-Email: ryanb44363@gmail.com  
-Website: https://munus-solutions.us  
+Made by Munus Solutions LLC
+Contact: Ryan Bellknapp
+Email: [info@munus-solutions.us](mailto:info@munus-solutions.us)
+Email: [ryanb44363@gmail.com](mailto:ryanb44363@gmail.com)
+Website: [https://munus-solutions.us](https://munus-solutions.us)
 Phone: (678) 585-6204
