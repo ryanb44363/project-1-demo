@@ -22,41 +22,39 @@
     canvas {
       border: 1px solid #ccc;
     }
-
-    /* Info boxes */
-    #infoBoxes {
+    #demoLog {
+      width: 800px;
+      max-height: 150px;
+      overflow-y: auto;
+      background: #eef;
+      padding: 8px;
+      border: 1px solid #ccc;
+      font-family: monospace;
+      margin-bottom: 10px;
+    }
+    #infoBoxes, #plotBoxes {
       display: flex;
       gap: 10px;
       margin: 10px;
+    }
+    .info-box, .plot-box {
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: monospace;
     }
     .info-box {
       border: 1px solid #888;
-      border-radius: 4px;
       background: #f0f0f0;
-      padding: 8px 12px;
-      font-family: monospace;
-    }
-
-    /* Plot boxes for quick plotting */
-    #plotBoxes {
-      display: flex;
-      gap: 10px;
-      margin: 10px;
     }
     .plot-box {
       border: 1px solid #006;
-      border-radius: 4px;
       background: #cce;
-      padding: 8px 12px;
-      font-family: monospace;
       cursor: pointer;
       user-select: none;
     }
     .plot-box:hover {
       background: #bbd;
     }
-
-    /* Custom parabola form */
     #customPlotForm {
       display: flex;
       gap: 6px;
@@ -71,21 +69,32 @@
 </head>
 <body>
   <h1>Parabola Plotter</h1>
+
   <div id="controls">
     <button id="parabolaModeBtn">Parabola Mode: OFF</button>
     <button id="rotateBtn">Rotate 135° CCW</button>
+    <button id="trialPlotBtn">Trial &amp; Plot</button>
     <input type="number" id="numberInput" placeholder="Number" />
     <input type="number" id="involutionsInput" placeholder="Involutions" />
     <button id="calculateBtn">Calculate</button>
     <span id="status">Status: Disconnected</span>
   </div>
 
+  <div id="demoLog"></div>
+
   <!-- Information boxes -->
   <div id="infoBoxes">
     <div class="info-box">
       <strong>drawParabola(a, b, c)</strong><br>
       Generates points for<br>
-      <code>y = x² + b·x + c</code>
+      <code>y = a·x² + b·x + c</code>
+    </div>
+    <div class="info-box">
+      <strong>Trial &amp; Plot</strong><br>
+      Step-by-step demo:<br>
+      samples x=0…5 → y=x² (orange),<br>
+      then rotates [5,25] (red)<br>
+      all by 135° CCW
     </div>
   </div>
 
