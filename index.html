@@ -32,29 +32,6 @@
       font-family: monospace;
       margin-bottom: 10px;
     }
-    #infoBoxes, #plotBoxes {
-      display: flex;
-      gap: 10px;
-      margin: 10px;
-    }
-    .info-box, .plot-box {
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-family: monospace;
-    }
-    .info-box {
-      border: 1px solid #888;
-      background: #f0f0f0;
-    }
-    .plot-box {
-      border: 1px solid #006;
-      background: #cce;
-      cursor: pointer;
-      user-select: none;
-    }
-    .plot-box:hover {
-      background: #bbd;
-    }
     #customPlotForm {
       display: flex;
       gap: 6px;
@@ -72,7 +49,6 @@
 
   <div id="controls">
     <button id="parabolaModeBtn">Parabola Mode: OFF</button>
-    <button id="rotateBtn">Rotate 135° CCW</button>
     <button id="trialPlotBtn">Trial &amp; Plot</button>
     <input type="number" id="numberInput" placeholder="Number" />
     <input type="number" id="involutionsInput" placeholder="Involutions" />
@@ -81,29 +57,6 @@
   </div>
 
   <div id="demoLog"></div>
-
-  <!-- Information boxes -->
-  <div id="infoBoxes">
-    <div class="info-box">
-      <strong>drawParabola(a, b, c)</strong><br>
-      Generates points for<br>
-      <code>y = a·x² + b·x + c</code>
-    </div>
-    <div class="info-box">
-      <strong>Trial &amp; Plot</strong><br>
-      Step-by-step demo:<br>
-      samples x=0…5 → y=x² (orange),<br>
-      then rotates [5,25] (red)<br>
-      all by 135° CCW
-    </div>
-  </div>
-
-  <!-- Quick-plot boxes -->
-  <div id="plotBoxes">
-    <div class="plot-box" data-a="1" data-b="2" data-c="0">Plot y = x² + 2x + 0</div>
-    <div class="plot-box" data-a="1" data-b="-2" data-c="1">Plot y = x² - 2x + 1</div>
-    <div class="plot-box" data-a="1" data-b="0" data-c="3">Plot y = x² + 0x + 3</div>
-  </div>
 
   <!-- Custom parabola plotting form -->
   <form id="customPlotForm">
