@@ -3,119 +3,134 @@ document.addEventListener("DOMContentLoaded", () => {
   const ctx = canvas.getContext("2d");
   const size = canvas.width;
 
-  // Center, scale, zoom, rotation
-  let centerX = size/2, centerY = size/2;
+  // Center, scale, zoom
+  let centerX = size / 2, centerY = size / 2;
   let baseScale = 20, zoom = 1;
-  let rotationAngle = 0;
+
+  // Rotation constants for 135° Clockwise
+  const theta = -3 * Math.PI / 4; // 135° CW
+  const cosTheta = Math.cos(theta);
+  const sinTheta = Math.sin(theta);
 
   // State
   const status = document.getElementById("status");
   const demoLog = document.getElementById("demoLog");
   let dots = [], wsDots = [], parabolaDots = [], parabolas = [];
-  let coefficients = [1,0,0];
+  let coefficients = [1, 0, 0];
   let isParabolaMode = false, parabolaPoints = [];
-  let rotatedSamplePoints = []; // {x,y,color}
+  let rotatedSamplePoints = []; // {x, y, color}
 
   // Coordinate transforms
   const scale = () => baseScale * zoom;
-  const toCanvas = (x,y) => [ centerX + x*scale(), centerY - y*scale() ];
-  const toMath   = (cx,cy) => {
+  const toCanvas = (x, y) => [centerX + x * scale(), centerY - y * scale()];
+  const toMath = (cx, cy) => {
     const dx = cx - centerX, dy = cy - centerY;
-    const cos = Math.cos(-rotationAngle), sin = Math.sin(-rotationAngle);
-    const rx = dx*cos - dy*sin, ry = dx*sin + dy*cos;
-    return [ rx/scale(), -ry/scale() ];
+    return [dx / scale(), -dy / scale()];
   };
 
   // Draw grid & axes
   function drawGrid() {
-    ctx.strokeStyle="#eee"; ctx.lineWidth=1;
+    ctx.strokeStyle = "#eee"; ctx.lineWidth = 1;
     const s = scale();
-    const left = -centerX/s, right=(size-centerX)/s;
-    const top = centerY/s, bottom=-(size-centerY)/s;
-    for(let i=Math.floor(left); i<=right; i++){
-      const x = centerX + i*s;
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,size); ctx.stroke();
+    const left = -centerX / s, right = (size - centerX) / s;
+    const top = centerY / s, bottom = -(size - centerY) / s;
+    for (let i = Math.floor(left); i <= right; i++) {
+      const x = centerX + i * s;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, size); ctx.stroke();
     }
-    for(let i=Math.floor(bottom); i<=top; i++){
-      const y = centerY - i*s;
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(size,y); ctx.stroke();
+    for (let i = Math.floor(bottom); i <= top; i++) {
+      const y = centerY - i * s;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(size, y); ctx.stroke();
     }
-    ctx.strokeStyle="#000"; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(centerX,0); ctx.lineTo(centerX,size); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,centerY); ctx.lineTo(size,centerY); ctx.stroke();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(centerX, 0); ctx.lineTo(centerX, size); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(size, centerY); ctx.stroke();
   }
 
-  // Draw continuous parabola
-  function drawParabola(a,b,c,color="green"){
-    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
-    const step = 0.1/zoom;
-    const xmin = -centerX/scale(), xmax=(size-centerX)/scale();
-    let started=false;
-    for(let x=xmin; x<=xmax; x+=step){
-      const y = a*x*x + b*x + c;
-      const [cx,cy] = toCanvas(x,y);
-      if(!started){ ctx.moveTo(cx,cy); started=true; }
-      else         { ctx.lineTo(cx,cy); }
+  // Apply 135° CW rotation to a point
+  function rotatePoint(x, y) {
+    return [
+      cosTheta * x - sinTheta * y,
+      sinTheta * x + cosTheta * y
+    ];
+  }
+
+  // Draw continuous rotated parabola
+  function drawParabola(a, b, c, color = "green") {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const step = 0.1 / zoom;
+    const xmin = -centerX / scale(), xmax = (size - centerX) / scale();
+    let started = false;
+    for (let x = xmin; x <= xmax; x += step) {
+      const y = a * x * x + b * x + c;
+      const [rx, ry] = rotatePoint(x, y);
+      const [cx, cy] = toCanvas(rx, ry);
+      if (!started) {
+        ctx.moveTo(cx, cy);
+        started = true;
+      } else {
+        ctx.lineTo(cx, cy);
+      }
     }
     ctx.stroke();
   }
 
-  // Fit parabola to 3 clicks
+  // Fit parabola to 3 points
   function fitParabola(pts) {
-    const [[x1,y1],[x2,y2],[x3,y3]] = pts;
-    const denom = (x1-x2)*(x1-x3)*(x2-x3);
+    const [[x1, y1], [x2, y2], [x3, y3]] = pts;
+    const denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
     if (!denom) return null;
-    const a = (x3*(y2-y1)+x2*(y1-y3)+x1*(y3-y2)) / denom;
-    const b = (x3**2*(y1-y2)+x2**2*(y3-y1)+x1**2*(y2-y3)) / denom;
+    const a = (x3 * (y2 - y1) + x2 * (y1 - y3) + x1 * (y3 - y2)) / denom;
+    const b = (x3 ** 2 * (y1 - y2) + x2 ** 2 * (y3 - y1) + x1 ** 2 * (y2 - y3)) / denom;
     const c = (
-      x2*x3*(x2-x3)*y1 +
-      x3*x1*(x3-x1)*y2 +
-      x1*x2*(x1-x2)*y3
+      x2 * x3 * (x2 - x3) * y1 +
+      x3 * x1 * (x3 - x1) * y2 +
+      x1 * x2 * (x1 - x2) * y3
     ) / denom;
-    return [a,b,c];
+    return [a, b, c];
   }
 
   // Draw a labeled dot
-  function drawDot(x,y,color="red"){
-    const [cx,cy] = toCanvas(x,y);
-    ctx.beginPath(); ctx.arc(cx,cy,4,0,2*Math.PI);
-    ctx.fillStyle=color; ctx.fill();
-    ctx.fillStyle="black"; ctx.font="12px monospace";
-    ctx.fillText(`(${x.toFixed(2)},${y.toFixed(2)})`, cx+5, cy-5);
+  function drawDot(x, y, color = "red") {
+    const [cx, cy] = toCanvas(x, y);
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.fillStyle = "black";
+    ctx.font = "12px monospace";
+    ctx.fillText(`(${x.toFixed(2)},${y.toFixed(2)})`, cx + 5, cy - 5);
   }
 
   // Full redraw
   function redraw() {
-    ctx.clearRect(0,0,size,size);
-    ctx.save();
-      ctx.translate(centerX,centerY);
-      ctx.rotate(rotationAngle);
-      ctx.translate(-centerX,-centerY);
-      drawGrid();
-      drawParabola(...coefficients,"blue");
-      parabolas.forEach(p=>drawParabola(...p,"purple"));
-      dots.forEach(d=>drawDot(d.x,d.y));
-      wsDots.forEach(d=>drawDot(d.x,d.y,"green"));
-      parabolaDots.forEach(d=>drawDot(d.x,d.y,"purple"));
-    ctx.restore();
-    rotatedSamplePoints.forEach(d=>drawDot(d.x,d.y,d.color));
+    ctx.clearRect(0, 0, size, size);
+    drawGrid();
+    drawParabola(...coefficients, "blue");
+    parabolas.forEach(p => drawParabola(...p, "purple"));
+    dots.forEach(d => drawDot(d.x, d.y));
+    wsDots.forEach(d => drawDot(d.x, d.y, "green"));
+    parabolaDots.forEach(d => drawDot(d.x, d.y, "purple"));
+    rotatedSamplePoints.forEach(d => drawDot(d.x, d.y, d.color));
   }
 
   // Canvas click handler
   canvas.addEventListener("click", e => {
     const rect = canvas.getBoundingClientRect();
-    const [x,y] = toMath(e.clientX-rect.left, e.clientY-rect.top);
+    const [x, y] = toMath(e.clientX - rect.left, e.clientY - rect.top);
     if (isParabolaMode) {
-      parabolaPoints.push([x,y]);
-      parabolaDots.push({x,y});
+      parabolaPoints.push([x, y]);
+      parabolaDots.push({ x, y });
       if (parabolaPoints.length === 3) {
         const fit = fitParabola(parabolaPoints);
         if (fit) parabolas.push(fit);
         parabolaPoints = [];
       }
     } else {
-      const yv = coefficients[0]*x*x + coefficients[1]*x + coefficients[2];
-      dots.push({x,y:yv});
+      const yv = coefficients[0] * x * x + coefficients[1] * x + coefficients[2];
+      dots.push({ x, y: yv });
     }
     redraw();
   });
@@ -126,16 +141,10 @@ document.addEventListener("DOMContentLoaded", () => {
       isParabolaMode = !isParabolaMode;
       parabolaPoints = [];
       document.getElementById("parabolaModeBtn")
-        .textContent = `Parabola Mode: ${isParabolaMode?"ON":"OFF"}`;
+        .textContent = `Parabola Mode: ${isParabolaMode ? "ON" : "OFF"}`;
     });
 
-  document.getElementById("rotateBtn")
-    .addEventListener("click", () => {
-      rotationAngle = (rotationAngle + 3*Math.PI/4) % (2*Math.PI);
-      redraw();
-    });
-
-  // Single “Trial & Plot” demo
+  // Trial & Plot demo (135° CW)
   document.getElementById("trialPlotBtn")
     .addEventListener("click", () => {
       const btn = document.getElementById("trialPlotBtn");
@@ -144,11 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
       demoLog.innerHTML = "";
       redraw();
 
-      const θ   = 3*Math.PI/4,
-            cos = Math.cos(θ),
-            sin = Math.sin(θ);
-
-      // helper to log
       const log = msg => {
         const div = document.createElement("div");
         div.textContent = msg;
@@ -156,24 +160,21 @@ document.addEventListener("DOMContentLoaded", () => {
         demoLog.scrollTop = demoLog.scrollHeight;
       };
 
-      log("Demo started: sampling x=0…5 and rotating each point by 135° CCW…");
+      log("Demo started: sampling x=0…5 and rotating each point by 135° CW…");
 
-      [0,1,2,3,4,5].forEach((x, i) => {
+      [0, 1, 2, 3, 4, 5].forEach((x, i) => {
         setTimeout(() => {
-          const y = x*x;
-          const rx = cos*x - sin*y,
-                ry = sin*x + cos*y;
-          rotatedSamplePoints.push({x:rx, y:ry, color:"orange"});
+          const y = x * x;
+          const [rx, ry] = rotatePoint(x, y);
+          rotatedSamplePoints.push({ x: rx, y: ry, color: "orange" });
           redraw();
-          log(`Step ${i+1}: (x,y)=(${x},${y}) → rotated→ (${rx.toFixed(3)}, ${ry.toFixed(3)})`);
+          log(`Step ${i + 1}: (x,y)=(${x},${y}) → rotated→ (${rx.toFixed(3)}, ${ry.toFixed(3)})`);
 
-          // after the last sample, schedule the test vector
           if (i === 5) {
             setTimeout(() => {
               const x0 = 5, y0 = 25;
-              const rx0 = cos*x0 - sin*y0,
-                    ry0 = sin*x0 + cos*y0;
-              rotatedSamplePoints.push({x:rx0, y:ry0, color:"red"});
+              const [rx0, ry0] = rotatePoint(x0, y0);
+              rotatedSamplePoints.push({ x: rx0, y: ry0, color: "red" });
               redraw();
               log(`Test vector: [5,25] → rotated→ (${rx0.toFixed(3)}, ${ry0.toFixed(3)})`);
               log("Demo complete.");
@@ -188,9 +189,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.plot-box').forEach(box => {
     box.addEventListener("click", () => {
       const a = parseFloat(box.dataset.a),
-            b = parseFloat(box.dataset.b),
-            c = parseFloat(box.dataset.c);
-      parabolas.push([a,b,c]);
+        b = parseFloat(box.dataset.b),
+        c = parseFloat(box.dataset.c);
+      parabolas.push([a, b, c]);
       redraw();
     });
   });
@@ -199,15 +200,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("plotCustomBtn")
     .addEventListener("click", () => {
       const a = parseFloat(document.getElementById("aInput").value),
-            b = parseFloat(document.getElementById("bInput").value),
-            c = parseFloat(document.getElementById("cInput").value);
+        b = parseFloat(document.getElementById("bInput").value),
+        c = parseFloat(document.getElementById("cInput").value);
       if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
-        parabolas.push([a,b,c]);
+        parabolas.push([a, b, c]);
         redraw();
       }
     });
 
-  // WebSocket calculation (unchanged)
+  // WebSocket calculation
   document.getElementById("calculateBtn")
     .addEventListener("click", () => {
       const number = parseFloat(document.getElementById("numberInput").value);
@@ -220,15 +221,15 @@ document.addEventListener("DOMContentLoaded", () => {
         status.textContent = "Status: Missing input values";
         return;
       }
-      ws.send(JSON.stringify({message_type:"calculate",number,involutions}));
+      ws.send(JSON.stringify({ message_type: "calculate", number, involutions }));
       status.textContent = "Status: Calculating...";
     });
 
   function setupWebSocket() {
     ws = new WebSocket("ws://localhost:4000/");
-    ws.onopen    = () => status.textContent = "Status: Connected";
-    ws.onclose   = () => status.textContent = "Status: Disconnected";
-    ws.onerror   = () => status.textContent = "Status: Error";
+    ws.onopen = () => status.textContent = "Status: Connected";
+    ws.onclose = () => status.textContent = "Status: Disconnected";
+    ws.onerror = () => status.textContent = "Status: Error";
     ws.onmessage = msg => {
       const data = JSON.parse(msg.data);
       if (data.message_type === "equation") {
@@ -236,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dots = []; wsDots = []; redraw();
       } else if (data.message_type === "new_dot") {
         const x = Math.round(data.x), y = Math.round(data.y);
-        wsDots.push({x,y}); redraw();
+        wsDots.push({ x, y }); redraw();
       }
     };
   }
@@ -245,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.addEventListener("wheel", e => {
     e.preventDefault();
     const factor = 1.1;
-    zoom *= e.deltaY < 0 ? factor : 1/factor;
+    zoom *= e.deltaY < 0 ? factor : 1 / factor;
     zoom = Math.max(0.1, Math.min(zoom, 10));
     redraw();
   });
