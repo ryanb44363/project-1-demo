@@ -47,12 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(size, centerY); ctx.stroke();
   }
 
-  // Apply 135° CW rotation to a point
+  // Apply 135° CW rotation and mirror over the Y-axis
   function rotatePoint(x, y) {
-    return [
-      cosTheta * x - sinTheta * y,
-      sinTheta * x + cosTheta * y
-    ];
+    const rx = cosTheta * x - sinTheta * y;
+    const ry = sinTheta * x + cosTheta * y;
+    return [-rx, ry];
   }
 
   // Draw continuous rotated parabola
