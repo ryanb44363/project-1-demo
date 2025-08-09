@@ -128,8 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         parabolaPoints = [];
       }
     } else {
-      const yv = coefficients[0] * x * x + coefficients[1] * x + coefficients[2];
-      dots.push({ x, y: yv });
+      dots.push({ x, y });
     }
     redraw();
   });
