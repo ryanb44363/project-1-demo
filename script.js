@@ -47,11 +47,20 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(size, centerY); ctx.stroke();
   }
 
-  // Apply 135° CW rotation and mirror over the Y-axis
+  // Apply 135° CW rotation and mirror over the Y-axis (display transform)
   function rotatePoint(x, y) {
     const rx = cosTheta * x - sinTheta * y;
     const ry = sinTheta * x + cosTheta * y;
     return [-rx, ry];
+  }
+
+  // Inverse of rotatePoint: undo mirror, then rotate back by -theta (math <- display)
+  function invRotatePoint(X, Y) {
+    const rx = -X; // undo mirror on X
+    const ry =  Y;
+    const x =  cosTheta * rx + sinTheta * ry;
+    const y = -sinTheta * rx + cosTheta * ry;
+    return [x, y];
   }
 
   // Draw continuous rotated parabola
@@ -63,8 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const xmin = -centerX / scale(), xmax = (size - centerX) / scale();
     let started = false;
     for (let x = xmin; x <= xmax; x += step) {
-      const y = a * x * x + b * x + c;
-      const [rx, ry] = rotatePoint(x, y);
+      const y = a * x * x + b * x + c; // math frame
+      const [rx, ry] = rotatePoint(x, y); // to display frame
       const [cx, cy] = toCanvas(rx, ry);
       if (!started) {
         ctx.moveTo(cx, cy);
@@ -76,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.stroke();
   }
 
-  // Fit parabola to 3 points
+  // Fit parabola to 3 points (math frame)
   function fitParabola(pts) {
     const [[x1, y1], [x2, y2], [x3, y3]] = pts;
     const denom = (x1 - x2) * (x1 - x3) * (x2 - x3);
@@ -91,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return [a, b, c];
   }
 
-  // Draw a labeled dot
+  // Draw a labeled dot (expects display-frame coordinates)
   function drawDot(x, y, color = "red") {
     const [cx, cy] = toCanvas(x, y);
     ctx.beginPath();
@@ -115,21 +124,30 @@ document.addEventListener("DOMContentLoaded", () => {
     rotatedSamplePoints.forEach(d => drawDot(d.x, d.y, d.color));
   }
 
-  // Canvas click handler
+  // Canvas click handler — convert display->math for computation, then back to display for drawing
   canvas.addEventListener("click", e => {
     const rect = canvas.getBoundingClientRect();
-    const [x, y] = toMath(e.clientX - rect.left, e.clientY - rect.top);
+
+    // Coordinates in display frame from the canvas pixels
+    const [dispX, dispY] = toMath(e.clientX - rect.left, e.clientY - rect.top);
+
+    // Convert click to math frame used by coefficients/parabola fitting
+    const [mx, my] = invRotatePoint(dispX, dispY);
+
     if (isParabolaMode) {
-      parabolaPoints.push([x, y]);
-      parabolaDots.push({ x, y });
+      // Use math-frame points for the fit, but show dots where the user clicked (display frame)
+      parabolaPoints.push([mx, my]);
+      parabolaDots.push({ x: dispX, y: dispY });
       if (parabolaPoints.length === 3) {
         const fit = fitParabola(parabolaPoints);
-        if (fit) parabolas.push(fit);
+        if (fit) parabolas.push(fit); // drawParabola rotates for display
         parabolaPoints = [];
       }
     } else {
-      const yv = coefficients[0] * x * x + coefficients[1] * x + coefficients[2];
-      dots.push({ x, y: yv });
+      // Snap to current parabola: compute y in math frame at clicked math x, then rotate to display for drawing
+      const yv = coefficients[0] * mx * mx + coefficients[1] * mx + coefficients[2];
+      const [dx, dy] = rotatePoint(mx, yv);
+      dots.push({ x: dx, y: dy });
     }
     redraw();
   });
@@ -235,8 +253,11 @@ document.addEventListener("DOMContentLoaded", () => {
         coefficients = data.coefficients;
         dots = []; wsDots = []; redraw();
       } else if (data.message_type === "new_dot") {
+        // server sends math-frame points; rotate to display frame before drawing
         const x = Math.round(data.x), y = Math.round(data.y);
-        wsDots.push({ x, y }); redraw();
+        const [dx, dy] = rotatePoint(x, y);
+        wsDots.push({ x: dx, y: dy });
+        redraw();
       }
     };
   }
